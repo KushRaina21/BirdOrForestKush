@@ -1,42 +1,28 @@
 ---
-title: TestingFirstProject
-emoji: 👀
-colorFrom: red
-colorTo: gray
-sdk: static
+title: BirdOrForestKush
+emoji: 🐦
+colorFrom: green
+colorTo: blue
+sdk: streamlit
 pinned: false
+short_description: Bird or forest image classifier demo
 ---
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+# BirdOrForestKush
 
-## CodeLlama inference helper
+This Hugging Face Space hosts a simple image classification demo that predicts whether an uploaded photo looks more like a bird or a forest scene.
 
-Files added in this workspace:
-- `requirements.txt` — Python packages to install
-- `run_inference.py` — small script to load a CodeLlama model and generate output
-
-Usage (Kaggle notebook or local):
-
-1) Install dependencies:
+## Run locally
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
+streamlit run app.py
 ```
 
-2) (Optional) Set a model name. Default is `codellama/CodeLlama-7b-hf`.
+## Notes
 
-```bash
-export MODEL_NAME=codellama/CodeLlama-7b-hf
-```
-
-3) Run the script:
-
-```bash
-python run_inference.py
-```
-
-Notes:
-- On Kaggle, prefer the GPU runtime and install packages in a notebook cell.
-- If GPU memory is insufficient, use a smaller CodeLlama variant or enable 8-bit loading via `bitsandbytes` and `transformers` quantization features.
-- Model weights are pulled from Hugging Face; ensure you have access if a model requires an agreement.
+- The app loads a demo model file if present and falls back to a lightweight heuristic when no trained model is available.
+- You can replace `model.pkl` with a real trained classifier later.
 
