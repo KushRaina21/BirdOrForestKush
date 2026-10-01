@@ -68,11 +68,9 @@ def extract_features(image: Image.Image):
 
 def fallback_classify(image: Image.Image):
     features = extract_features(image)
-    forest_score = (
-        features["green_pixels"] * 0.65
-        + features["green_ratio"] * 0.25
-        + (1.0 - features["warm_ratio"]) * 0.10
-    )
+    vegetation_signal = min(features["green_pixels"] / 0.30, 1.0)
+    green_dominance = min(max((features["green_ratio"] - 0.30) / 0.15, 0.0), 1.0)
+    forest_score = vegetation_signal * 0.70 + green_dominance * 0.30
     bird_score = 1.0 - forest_score
 
     if forest_score >= bird_score:
