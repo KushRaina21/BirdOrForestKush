@@ -51,6 +51,9 @@ def extract_features(image: Image.Image):
     mean_brightness = float((r + g + b).mean() / 3.0)
     green_ratio = float(avg_g / max(avg_r + avg_g + avg_b, 1e-6))
     warm_ratio = float((avg_r + avg_b) / max(avg_g + avg_r + avg_b, 1e-6))
+    green_pixels = float(
+        ((g > r * 1.05) & (g > b * 1.02) & (g > 45)).mean()
+    )
 
     return {
         "avg_r": avg_r,
@@ -59,20 +62,25 @@ def extract_features(image: Image.Image):
         "mean_brightness": mean_brightness,
         "green_ratio": green_ratio,
         "warm_ratio": warm_ratio,
+        "green_pixels": green_pixels,
     }
 
 
 def fallback_classify(image: Image.Image):
     features = extract_features(image)
-    forest_score = features["green_ratio"] * 1.25 + (1.0 - features["warm_ratio"]) * 0.7
-    bird_score = features["warm_ratio"] * 0.9 + (1.0 - features["green_ratio"]) * 0.8
+    forest_score = (
+        features["green_pixels"] * 0.65
+        + features["green_ratio"] * 0.25
+        + (1.0 - features["warm_ratio"]) * 0.10
+    )
+    bird_score = 1.0 - forest_score
 
     if forest_score >= bird_score:
         label = "Forest"
-        confidence = min(max(forest_score, 0.0), 1.0)
+        confidence = min(max(0.5 + abs(forest_score - 0.5) * 0.45, 0.0), 0.95)
     else:
         label = "Bird"
-        confidence = min(max(bird_score, 0.0), 1.0)
+        confidence = min(max(0.5 + abs(bird_score - 0.5) * 0.45, 0.0), 0.95)
     return label, round(confidence * 100, 1), features
 
 
