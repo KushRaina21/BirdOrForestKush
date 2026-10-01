@@ -10,7 +10,7 @@ short_description: Bird or forest image classifier demo
 
 # BirdOrForestKush
 
-This Hugging Face Space hosts a simple image classification demo that predicts whether an uploaded photo looks more like a bird or a forest scene.
+This Streamlit app predicts whether an uploaded photo looks more like a bird or a forest scene.
 
 ## Run locally
 
@@ -21,8 +21,13 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+## Streamlit Community Cloud
+
+Deploy this repository from Streamlit Community Cloud with `app.py` as the main file. The app requires the packages listed in `requirements.txt`.
+
 ## Notes
 
-- The app loads a demo model file if present and falls back to a lightweight heuristic when no trained model is available.
-- You can replace `model.pkl` with a real trained classifier later.
+- The app checks `model.pkl` and then `bird_model.pkl` for a compatible Bird-or-Forest fastai learner.
+- If no compatible learner loads, the UI identifies its result as a color-based demo fallback.
+- The included serialized learners currently require additional compatibility work, so verify the prediction source in the live app before treating results as trained-model output.
 

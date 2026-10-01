@@ -2,3 +2,10 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+BirdOrForestKush/
+index.html
+style.css
+download_model.py
+run_inference.py
+run_llama_cpp.py

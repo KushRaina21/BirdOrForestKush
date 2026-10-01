@@ -9,6 +9,11 @@ MODEL_PATHS = [
     Path(__file__).resolve().parent / "model.pkl",
     Path(__file__).resolve().parent / "bird_model.pkl",
 ]
+EXPECTED_LABELS = {"bird", "forest"}
+
+
+def is_cat(path):
+    return path.name.startswith("cat")
 
 
 def load_fastai_model(candidate_paths):
@@ -22,6 +27,9 @@ def load_fastai_model(candidate_paths):
             continue
         try:
             model = load_learner(path)
+            labels = {str(label).lower() for label in model.dls.vocab}
+            if not EXPECTED_LABELS.issubset(labels):
+                continue
             return model
         except Exception:
             continue
@@ -74,11 +82,12 @@ def classify_image(image: Image.Image):
             prediction, _, probs = MODEL.predict(image)
             label = str(prediction)
             confidence = float(probs.max().item() * 100)
-            return label, round(confidence, 1), extract_features(image)
+            return label, round(confidence, 1), extract_features(image), "trained fastai model"
         except Exception:
             pass
 
-    return fallback_classify(image)
+    label, confidence, features = fallback_classify(image)
+    return label, confidence, features, "color-based demo fallback"
 
 
 st.set_page_config(page_title="Bird or Forest", page_icon="🦜", layout="centered")
@@ -91,9 +100,10 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded image", use_container_width=True)
 
-    label, confidence, features = classify_image(image)
+    label, confidence, features, prediction_source = classify_image(image)
 
     st.success(f"Prediction: {label} ({confidence}%)")
+    st.caption(f"Prediction source: {prediction_source}")
 
     with st.expander("Feature summary"):
         st.write({
@@ -108,4 +118,4 @@ else:
     st.info("Please upload an image to get a prediction.")
 
 st.markdown("---")
-st.write("This demo prefers a trained fastai model when available and falls back to a color-based heuristic if the saved model cannot be loaded.")
+st.write("The app uses the trained fastai model when it loads successfully. Otherwise, it labels the result as a color-based demo fallback.")
